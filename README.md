@@ -171,17 +171,30 @@ See `.env.example` for the full list. Important groups:
 | `WHATSAPP_*` | Cloud API credentials |
 | `OPENAI_*` / `LLM_PROVIDER` | Extraction provider (`openai` or `heuristic`) |
 
-## Run locally
+## Browser demo (no WhatsApp account needed)
+
+After install:
 
 ```bash
-npm run dev          # tsx watch
-npm run build        # compile to dist/
-npm start            # run compiled server
-npm test             # vitest
-npm run typecheck    # tsc --noEmit
+cp .env.example .env
+# set LLM_PROVIDER=heuristic in .env
+npm run dev
 ```
 
-Health check: `GET /health`
+Open:
+
+```text
+http://localhost:3000/
+```
+
+Full step-by-step (Windows / Mac / Linux download + setup):
+
+- [`docs/BROWSER_SETUP.md`](docs/BROWSER_SETUP.md)
+
+Quick starters:
+
+- Windows: double-click `start-windows.bat`
+- Mac/Linux: `chmod +x start.sh && ./start.sh`
 
 ## Admin endpoints
 

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Payout Agent — Browser Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/demo.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="brand">
+        <p class="product">PayoutDesk</p>
+        <h1>WhatsApp Payout Agent</h1>
+        <p class="lede">
+          Browser demo of the agent. Type like a customer on WhatsApp — no Meta
+          account required for local testing.
+        </p>
+      </header>
+
+      <section class="chat-panel" aria-label="Demo chat">
+        <div class="chat-meta">
+          <label>
+            Your WhatsApp number
+            <input
+              id="phone"
+              type="text"
+              value="919876543210"
+              autocomplete="tel"
+              spellcheck="false"
+            />
+          </label>
+          <p class="hint">
+            Demo customer: <code>CUST001</code> · number
+            <code>919876543210</code> · max ₹50,000
+          </p>
+        </div>
+
+        <div id="messages" class="messages" role="log" aria-live="polite"></div>
+
+        <form id="chat-form" class="composer">
+          <label class="sr-only" for="message">Message</label>
+          <textarea
+            id="message"
+            rows="2"
+            placeholder='Try: "I want a payout of 5000"'
+            required
+          ></textarea>
+          <div class="composer-actions">
+            <div class="quick">
+              <button type="button" data-fill="I want a payout of 5000">Payout 5000</button>
+              <button type="button" data-fill="I need a payout">Need payout</button>
+              <button type="button" data-fill="What's my payout status?">Status</button>
+              <button type="button" data-fill="help">Help</button>
+            </div>
+            <button type="submit" id="send">Send</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="side">
+        <h2>System status</h2>
+        <pre id="health">Loading…</pre>
+        <h2>How to use</h2>
+        <ol>
+          <li>Keep this page open after <code>npm run dev</code></li>
+          <li>Send a message as the customer</li>
+          <li>Follow the agent prompts (amount / customer ID)</li>
+          <li>Get a <code>PAY-#####</code> confirmation</li>
+        </ol>
+        <p class="note">
+          Full WhatsApp + Google Sheets setup is in
+          <code>README.md</code> and <code>docs/BROWSER_SETUP.md</code>.
+        </p>
+      </aside>
+    </main>
+    <script src="/demo.js" type="module"></script>
+  </body>
+</html>

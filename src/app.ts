@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -10,6 +12,7 @@ import { webhookRateLimiter } from './middleware/rateLimiter.js';
 import { createWhatsAppWebhookRouter } from './whatsapp/webhook.js';
 import { WhatsAppService } from './whatsapp/whatsappService.js';
 import { createAdminRouter } from './admin/adminRoutes.js';
+import { createDemoRouter } from './demo/demoRoutes.js';
 import { PayoutAgent } from './agent/agent.js';
 import { ConversationOrchestrator } from './agent/conversationOrchestrator.js';
 import { PayoutService } from './payout/payoutService.js';
@@ -21,6 +24,10 @@ import { GoogleSheetsPayoutRepository, InMemoryPayoutRepository } from './google
 import type { CustomerRepository, PayoutRepository } from './repositories/interfaces.js';
 import { isGoogleSheetsConfigured } from './config/env.js';
 import type { Customer } from './database/types.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.resolve(__dirname, '../public');
 
 export interface AppDependencies {
   customers?: CustomerRepository;
@@ -48,14 +55,29 @@ export function createApp(deps: AppDependencies = {}): Express {
 
   const app = express();
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          "default-src": ["'self'"],
+          "script-src": ["'self'"],
+          "style-src": ["'self'", 'https://fonts.googleapis.com'],
+          "font-src": ["'self'", 'https://fonts.gstatic.com', 'data:'],
+          "img-src": ["'self'", 'data:'],
+          "connect-src": ["'self'"],
+        },
+      },
+    }),
+  );
   app.use(cors({ origin: false }));
   app.use(express.json({ limit: '1mb' }));
   app.use(
     pinoHttp({
       logger,
       autoLogging: {
-        ignore: (req: IncomingMessage) => req.url === '/health',
+        ignore: (req: IncomingMessage) =>
+          req.url === '/health' || req.url === '/' || Boolean(req.url?.startsWith('/demo.')),
       },
       serializers: {
         req(req: IncomingMessage & { id?: string }) {
@@ -69,6 +91,8 @@ export function createApp(deps: AppDependencies = {}): Express {
     }),
   );
 
+  app.use(express.static(publicDir));
+
   app.get('/health', (_req, res) => {
     res.json({
       status: 'ok',
@@ -79,6 +103,7 @@ export function createApp(deps: AppDependencies = {}): Express {
     });
   });
 
+  app.use('/demo', webhookRateLimiter, createDemoRouter(orchestrator));
   app.use('/webhook', webhookRateLimiter, createWhatsAppWebhookRouter({ orchestrator, whatsapp }));
   app.use('/admin', createAdminRouter({ customers, payouts }));
 
